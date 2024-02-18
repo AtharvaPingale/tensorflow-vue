@@ -40,6 +40,7 @@ import { ref, onMounted, defineComponent } from 'vue'
 import '@tensorflow/tfjs-backend-cpu'
 import '@tensorflow/tfjs-backend-webgl'
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
+import { capitalCase } from 'change-case'
 const video = document.getElementById('videoElement')
 const img = document.getElementById('imageElement')
 export default defineComponent({
@@ -67,6 +68,24 @@ export default defineComponent({
       result.value = predictions
       if(!result.value.length) result.value.push({class:"No objects detected, please try again"}) 
       console.log(predictions, img)
+
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      ctx.canvas.width = img.clientWidth;
+      ctx.canvas.height = img.clientHeight;
+      ctx.drawImage(img, 0, 0, img.clientWidth, img.clientHeight)
+      ctx.strokeStyle = "#39ff14";
+      
+      ctx.font = "15px Arial";
+      result.value?.forEach((x)=>{
+        ctx.fillStyle = "#FFFF00";
+        ctx.fillText(`${capitalCase(x.class)} (${Math.round(x.score * 100)}%)` , x.bbox[0]+5, x.bbox[1]+20);
+        ctx.strokeRect(
+        ...x.bbox
+      );
+      })
+      const data = canvas.toDataURL('image/png')
+      imgRef.value.setAttribute('src', data)
     }
 
     async function openCamera() {
