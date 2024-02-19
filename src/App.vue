@@ -12,10 +12,6 @@
           <span>Detect Object</span>
         </button>
       </div>
-
-      <div v-if="result.length > 0">
-        <p>{{ result.map((x) => x.class).join(', ') }}</p>
-      </div>
     </div>
     <div class="image-container mb-3">
       <div class="border">
@@ -32,6 +28,20 @@
         />
       </div>
     </div>
+    <table class="table w-50 m-auto" v-if="result.length > 0">
+      <thead>
+        <tr>
+          <th scope="col">Object</th>
+          <th scope="col">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="obj in result" :key="obj.class">
+          <td>{{obj.class}}</td>
+          <td>{{obj.score}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -67,19 +77,21 @@ export default defineComponent({
       const predictions = await model.detect(img)
       result.value = predictions
       if(!result.value.length) result.value.push({class:"No objects detected, please try again"}) 
-      console.log(predictions, img)
+      else result.value = result.value.map((x) => ({...x,class: capitalCase(x.class)}))
 
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
       ctx.canvas.width = img.clientWidth;
       ctx.canvas.height = img.clientHeight;
       ctx.drawImage(img, 0, 0, img.clientWidth, img.clientHeight)
-      ctx.strokeStyle = "#39ff14";
       
       ctx.font = "15px Arial";
       result.value?.forEach((x)=>{
-        ctx.fillStyle = "#FFFF00";
-        ctx.fillText(`${capitalCase(x.class)} (${Math.round(x.score * 100)}%)` , x.bbox[0]+5, x.bbox[1]+20);
+        
+        
+        ctx.lineWidth = 3;
+        drawStroked(ctx,`${capitalCase(x.class)} (${Math.round(x.score * 100)}%)` , x.bbox[0]+5, x.bbox[1]+20);
+        ctx.strokeStyle = "#04D9FF";
         ctx.strokeRect(
         ...x.bbox
       );
@@ -88,9 +100,18 @@ export default defineComponent({
       imgRef.value.setAttribute('src', data)
     }
 
+    function drawStroked(ctx, text, x, y) {
+        ctx.font = '15px Arial';
+        ctx.strokeStyle = '#20639B';
+        // ctx.lineWidth = 3;
+        ctx.strokeText(text, x, y);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillText(text, x, y);
+    }
+
     async function openCamera() {
       if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment"} }).then((stream) => {
           isStreaming.value = true
           videoRef.value.srcObject = stream
         })
@@ -156,4 +177,9 @@ export default defineComponent({
     -moz-transform: rotateY(180deg); /* Firefox */
   }
 }
+@media (min-width: 400px) {
+    .image-container {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
