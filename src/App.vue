@@ -8,9 +8,7 @@
       <div v-else class="">
         <button @click="stopStreaming" class="btn btn-light">Stop Streaming</button>
         <button @click="snapshot" class="btn btn-light">Snapshot</button>
-        <button @click="detect" class="btn btn-light">
-          <span>Detect Object</span>
-        </button>
+        <button @click="detect" class="btn btn-light">Detect Object</button>
       </div>
     </div>
     <div class="image-container mb-3">
@@ -111,7 +109,7 @@ export default defineComponent({
 
     async function openCamera() {
       if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment"} }).then((stream) => {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user"} }).then((stream) => {
           isStreaming.value = true
           videoRef.value.srcObject = stream
         })
@@ -177,7 +175,7 @@ export default defineComponent({
     -moz-transform: rotateY(180deg); /* Firefox */
   }
 }
-@media (min-width: 400px) {
+@media (max-width: 400px) {
     .image-container {
       grid-template-columns: 1fr;
     }
