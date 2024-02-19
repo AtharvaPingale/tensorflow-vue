@@ -13,15 +13,12 @@
     </div>
     <div class="image-container mb-3">
       <div class="border">
-        <video ref="videoRef" autoplay="true" width="50%" height="50%" id="videoElement" />
+        <video ref="videoRef" autoplay="true" id="videoElement" />
       </div>
       <div class="border">
         <img
           src="@/assets/tf_logo_social.png"
-          class="image"
           ref="imgRef"
-          alt="image"
-          crossorigin="anonymous"
           id="imageElement"
         />
       </div>
@@ -79,8 +76,10 @@ export default defineComponent({
 
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
+
       ctx.canvas.width = img.clientWidth;
       ctx.canvas.height = img.clientHeight;
+      
       ctx.drawImage(img, 0, 0, img.clientWidth, img.clientHeight)
       
       ctx.font = "15px Arial";
@@ -159,10 +158,6 @@ export default defineComponent({
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  .image {
-    width: 50%;
-    height: 50%;
-  }
   #imageElement {
     width: 100%;
     height: 100%;
@@ -178,6 +173,7 @@ export default defineComponent({
 @media (max-width: 400px) {
     .image-container {
       grid-template-columns: 1fr;
+      grid-auto-rows: 1fr;
     }
   }
 </style>
